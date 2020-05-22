@@ -1,4 +1,3 @@
-# DFO_May2020
 This repository contains the materials for the Software Carpentry DFO workshop series, taking place May 26 - 29 from 12:30 - 4:00 pm Atlantic Time.  
 
 *Schedule*  
