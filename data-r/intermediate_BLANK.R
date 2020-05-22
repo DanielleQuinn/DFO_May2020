@@ -310,8 +310,7 @@ data_tb %>%
 
 # ---- Capstone {ggplot2} Exercise ----
 # Reproduce the plot found here:
-# https://github.com/DanielleQuinn/OTN_workshop/blob/master/GapMinderReport.pdf
-
+# https://github.com/DanielleQuinn/DFO_May2020/blob/master/data-r/visualization.png
 # Tip: Make a list of what needs to be done and tackle ONE thing at a time.
 
 # Here is a list of things you'll
