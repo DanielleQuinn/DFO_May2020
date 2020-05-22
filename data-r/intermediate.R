@@ -3,7 +3,7 @@ rm(list = ls())
 
 # ---- Clear Console ----
 # Windows: Ctrl-L
-# Mac: Cmmd-L
+# Mac: Cmd-L
 
 # ---- Load packages ----
 library(dplyr)
