@@ -420,7 +420,7 @@ plot3 + facet_wrap(~habitat, ncol = 1)
 
 # ---- Capstone {ggplot2} Exercise ----
 # Reproduce the plot found here:
-# https://github.com/DanielleQuinn/DFO_May2020/blob/master/data-r/visualization.png
+# https://github.com/DanielleQuinn/DFO_May2020/blob/master/data-r/myfigure.png
 # Tip: Make a list of what needs to be done and tackle ONE thing at a time.
 
 # Here is a list of things you'll
@@ -430,17 +430,16 @@ plot3 + facet_wrap(~habitat, ncol = 1)
 # http://www.cookbook-r.com/Graphs/
 # We haven't seen all of these yet!
 
-# data preparation:
+# Prepare the Data:
 # (1) subset table1 to only include samples from pools
 
-# creating the plot:
+# Create the Figure:
 # (1) Scatterplot with year on x axis and mean on y axis
 # (2) X axis label is Year
 # (3) Y axis label is Mean Number Caught
 # (4) Theme is black and white
 # (5) Point colour is based on site
 # (6) NEW! Points are triangles
-  ## See if you can work this one out with a partner
 # (7) Facet your plot based on site using facet_wrap
 # (8) Stack all facets into one column
 # (9) NEW! Draw a line connecting the points
@@ -452,19 +451,21 @@ plot3 + facet_wrap(~habitat, ncol = 1)
   ## Hint: Look at R Cookbook ggplot2 under "Facets"
 # (13) NEW! Specificy the colors to be used as red, blue, purple, orange, and black
   ## Hint: Look at R Cookbook ggplot2 under "Colors" > "Palettes Manually Defined"
-# (14) NEW! Name the lengend SITE ID
+# (14) NEW! Name the lengend Site ID
   ## Hint: You can specify this in the name argument of the function used in step (13) 
-# (16) NEW! Add a title: "Mean number of Central Stonerollers captured in pools between 2000 and 2015"
+# (15) NEW! Set the tick labels of the x axis to 1999, 2003, 2007, 2011, and 2015
+  ## Hint: Look at R Cookbook ggplot2 under "Axes"
+# (16) NEW! Add a title: "Central Stonerollers in Pools (1999-2015)"
   ## Hint: ggtitle()
 # (17) Store your finished plot in an object called myfigure
 # (18) NEW! Save your plot to your working directory!
   ## Hint: ggsave()
 
 # As you solve each piece, add an "x" next to it on the etherpad
-# https://etherpad.net/p/2019-09-28-afs
+# https://pad.carpentries.org/2020-05-26-dfo
 
 # Solution:
-myfigure <- ggplot(table1 %>% filter(habitat == "pool")) +
+myfigure <- ggplot(table1 %>% filter(habitat == "pool", year %in% 1999:2015)) +
   geom_point(aes(x = year, y = mean, col = site), size = 4, shape = "triangle") + 
   geom_line(aes(x = year, y = mean, col = site)) +
   geom_line(aes(x = year, y = maximum, col = site), linetype = "dashed") +
@@ -474,8 +475,9 @@ myfigure <- ggplot(table1 %>% filter(habitat == "pool")) +
   theme_bw(12) +
   facet_wrap(~site, ncol = 1, scales = "free_y") +
   scale_color_manual(values = c("red", "blue", "purple", "orange", "black"),
-                     name = "SITE ID") +
-  ggtitle("Mean number of Central Stonerollers captured in pools between 2000 and 2015")
+                     name = "Site ID") +
+  scale_x_continuous(breaks = c(1999, 2003, 2007, 2011, 2015)) +
+  ggtitle("Central Stonerollers in Pools (1999-2015)")
 
 myfigure
 
