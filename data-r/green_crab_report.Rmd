@@ -1,0 +1,115 @@
+---
+title: "Green Crab in NS"
+output: html_document
+---
+
+# What is Rmarkdown
+
+Rmarkdown is a form of literate programming that mixes R and markdown. First lets learn a little about markdown. Markdown is a human readable language with tags that define special formatting elements use to format documents. As you saw, when we render (i.e. knit) this document, we can get an html, pdf, or word document. This means you can make a whole report/manuscript reproducible including the text.
+
+Notice that instead of octothorpes (#) being used as comments in markdown, they are titles
+
+# Title
+## Main section
+### Sub-section
+#### Sub-sub section
+
+You can also have special formatting for text:
+
+**bold**
+_italics_
+`code-type`
+
+Additionally, R functions and code do nothing (yet):
+
+mean(c(2,3,4))
+
+... nothing! Until you place things in an R chunk:
+
+```{r}
+mean(c(2,3,4))
+```
+
+Will by default display the code and the output. You can hide the code in the rendered version:
+
+```{r, echo=FALSE}
+mean(c(2,3,4))
+```
+
+or you can hide the output:
+
+```{r, results='hide'}
+mean(c(2,3,4))
+```
+
+or you can also hide messages:
+```{r, message=FALSE}
+message("You will not see the message.")
+```
+
+Alternatively, you can render r 'inline' using back-ticks and the contents need to begin with 'r '. For example the mean(c(2,3,4)) is `r mean(c(2,3,4))` (that 3 was interpreted from the r code when we rendered the document!)
+
+This makes these types of documents extremely responsive to changes or updates in data. An extremely powerful tool in your 'reproducibility' tool belt!
+
+# Green Crab reporting
+
+Suppose I want to create a reproducible report about the extent of the European green crab invasion in Nova Scotia. Let also pretend the report starts HERE, because we ran some R code above and didn't yet load our packages which should always happen at the top of the script, but you needed to learn about Rmarkdown first so I made an exception. We're also hiding all of this because we don't need that in the report!
+
+```{r loading packages, message=FALSE, results='hide', echo=FALSE}
+library(robis)          # interface to get OBIS data
+library(sf)             # the GIS package of choice
+library(rnaturalearth)  # good background maps
+library(ggplot2)
+library(dplyr)
+```
+
+Cool right!
+
+Now let's make a quick basemap:
+
+```{r making basemap, message=FALSE, echo=FALSE}
+latlong <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" # for converting to lats/longs
+
+# and a projection to use for nice plots in the maritimes:
+maritimes_eqdc_proj <- "+proj=eqdc +lat_1=42.0 +lat_2=47.0 +lon_0=-62.0"  
+
+# getting and transforming Nova Scotia
+NS <- ne_states(country = c("Canada"),returnclass = "sf") %>%
+  dplyr::filter(postal=="NS") %>%  # get NS
+  st_transform(maritimes_eqdc_proj) # transform
+
+map <- ggplot(NS) + 
+  geom_sf(fill="burlywood",colour="burlywood",alpha=0.7)
+
+map
+```
+
+Now let's get some green crab data from [OBIS](https://obis.org/). You can query by species scientific name and spatial geometry in text format. Our `NS` polygon is too complicated, so let's make a box around `NS`
+
+```{r getting obis data}
+txt_geom <- NS %>% 
+  st_transform(latlong) %>% # transform back to latlong
+  st_bbox() %>%             # get bounding box
+  st_as_sfc() %>%           # convert bounding box to sf column polygon
+  st_as_text()              # convert to text
+
+crabs <- occurrence(scientificname = "Carcinus maenas",
+                    geometry = txt_geom)
+
+glimpse(crabs)
+```
+
+But not the `decimalLatitude` and `decimalLongitude` columns are not in the right format/units for plotting on a projected map.
+
+```{r mapping crabs}
+crabssf <- crabs %>% 
+  st_as_sf(coords=c("decimalLongitude",
+                    "decimalLatitude"),
+           crs=latlong) %>% # convert dataframe to sf object
+  st_transform(maritimes_eqdc_proj) # transform to eqdc
+
+map +
+  geom_sf(data=crabssf)
+
+```
+
